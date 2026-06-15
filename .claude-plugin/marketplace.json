@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "ship-kit",
+  "owner": {
+    "name": "Nicholas Sollazzo",
+    "email": "nick@positronick.com"
+  },
+  "metadata": {
+    "description": "The ship → babysit PR pipeline: clean, verify, review, commit, open a PR, and drive it to a green review approval.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "ship-kit",
+      "description": "/ship orchestrates simplify → verify → code-review → smart-commit → branch hygiene → PR → babysit; /babysit drives a GitHub PR to a fresh APPROVED + CI-green + mergeable state.",
+      "source": "./plugins/ship-kit"
+    }
+  ]
+}
