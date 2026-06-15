@@ -6,7 +6,7 @@ argument-hint: "[--fast] [--merge] [--effort low|medium|high] [--no-verify]"
 
 # Ship — working tree to green PR, one command
 
-Orchestrate the existing skills in order. **Invoke each stage via the Skill tool — never re-implement a stage's logic inline.** This skill only owns sequencing, gates, state, and the final report.
+Orchestrate the existing skills in order. **Invoke each stage by calling the exact skill it names, via the Skill tool — never re-implement a stage's logic inline, and never substitute a similarly-named subagent (Agent tool) or other tool for the named skill.** (Concretely: Stage 3 means the built-in `code-review` skill — *not* the `pr-review-toolkit:code-reviewer` agent, even when that plugin is installed and looks like a fit.) This skill only owns sequencing, gates, state, and the final report.
 
 ## Flags (parse from $ARGUMENTS)
 
@@ -62,7 +62,9 @@ git diff --name-only HEAD...origin/<base>           # files base changed since w
 
 ## Stage 3 — Code review (skip if --fast)
 
-Invoke the `code-review` skill with `--fix` at the requested effort (default medium), reviewing the **full change being shipped** (the diff vs base, per *Always simplify + review* in Cross-cutting rules) — so already-committed code is reviewed too, not just uncommitted edits.
+Invoke the **built-in `code-review` skill via the Skill tool** with `--fix` at the requested effort (default medium), reviewing the **full change being shipped** (the diff vs base, per *Always simplify + review* in Cross-cutting rules) — so already-committed code is reviewed too, not just uncommitted edits.
+
+**Use the `code-review` skill specifically — do NOT dispatch the `pr-review-toolkit:code-reviewer` / `silent-failure-hunter` agents (or any other reviewer) in its place.** Two reasons: (1) the skill's `--fix` is what *applies* the findings to the working tree so Stage 3 can re-verify and Stage 4 can commit them — the review agents only report; (2) `code-review` is built-in, so it's present wherever ship-kit is installed, whereas `pr-review-toolkit` is a separate plugin a given machine may not have.
 If it applied fixes AND Stage 2 ran: re-run the cheap verification (tests, not the full app walk) so review fixes are never committed unverified. Same gate as Stage 2.
 
 ## Stage 4 — Commit
