@@ -1,6 +1,6 @@
 ---
 name: ship
-description: Take a finished change from working tree to a green, mergeable PR by chaining simplify → verify → code-review → smart-commit → branch hygiene → PR → babysit. Use when the user says "ship", "ship it", "ship this", or wants the full clean→verify→review→commit→PR→green pipeline in one command. Default stops at approved + CI green + mergeable; does NOT merge unless --merge.
+description: Take a finished change from working tree to a green, mergeable PR by chaining simplify → verify → code-review → smart-commit → branch hygiene → PR → babysit → reflect. Use when the user says "ship", "ship it", "ship this", or wants the full clean→verify→review→commit→PR→green pipeline in one command. Default stops at approved + CI green + mergeable; does NOT merge unless --merge.
 argument-hint: "[--fast] [--merge] [--effort low|medium|high] [--no-verify]"
 ---
 
@@ -104,4 +104,9 @@ If the user wants a single status pass instead of the full loop, invoke `babysit
 - **--merge:** `gh pr merge <PR#> --squash --delete-branch` once green, then report the merge.
 - Delete `.claude/ship-state.json`.
 - Final summary must list every stage as run / skipped (--flag) / halted — no silent gaps.
-- If the session surfaced gotchas or tricky bugs, suggest `/reflect`.
+
+## Stage 10 — Reflect (final step)
+
+Invoke the `reflect` skill as the very last action, after the end-state report — so every ship ends by capturing what the session taught (gotchas, new patterns, integration quirks) into the knowledge base.
+
+Reflect is safe to run on every ship: it **self-gates** (scans the session and early-exits with "No new knowledge" when the work was routine) and **never auto-applies** — it proposes, then waits for a plain chat `ok`/`ko` before writing anything. Under `--merge` or headless/`/loop` runs it will still only *surface* suggestions and wait; it never mutates knowledge files without approval, so there's nothing to gate.

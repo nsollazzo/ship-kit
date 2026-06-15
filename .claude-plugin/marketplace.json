@@ -12,7 +12,7 @@
   "plugins": [
     {
       "name": "ship-kit",
-      "description": "/ship orchestrates simplify → verify → code-review → smart-commit → branch hygiene → PR → babysit; /babysit drives a GitHub PR to a fresh APPROVED + CI-green + mergeable state.",
+      "description": "/ship orchestrates simplify → verify → code-review → smart-commit → branch hygiene → PR → babysit → reflect; /babysit drives a GitHub PR to a fresh APPROVED + CI-green + mergeable state.",
       "source": "./plugins/ship-kit"
     }
   ]

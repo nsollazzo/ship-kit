@@ -7,13 +7,14 @@ mergeable pull request — and keeps the PR honest until a reviewer approves it.
 
 | Command | What it does |
 |---------|--------------|
-| `/ship` | Orchestrates the full pipeline: **simplify → verify → code-review → smart-commit → branch hygiene → PR → babysit.** Stops at *approved + CI green + mergeable*; only merges with `--merge`. |
+| `/ship` | Orchestrates the full pipeline: **simplify → verify → code-review → smart-commit → branch hygiene → PR → babysit → reflect.** Stops at *approved + CI green + mergeable*; only merges with `--merge`. |
 | `/babysit <PR#> [owner/repo]` | Drives one GitHub PR to a **fresh APPROVED + all CI green + `mergeable`** state. Each pass verifies every review finding against the code, fixes the valid ones, pushes back with evidence on the invalid, and replies on every thread. Never merges — a human does that. |
 | `/smart-commit` | Clusters uncommitted changes into logical groups and commits each with a conventional-commit message. |
+| `/reflect` | Captures session lessons (gotchas, patterns, integration quirks) into the knowledge base. Self-gating (early-exits when the work was routine) and never writes without your approval. Runs as `/ship`'s final step. |
 
 `/ship` calls `simplify`, `verify`, `code-review`, and `loop` — these are built-in
-Claude Code skills, present on any install. It calls `smart-commit`, which ships
-inside this plugin, and `babysit`, which is the command above. So the bundle is
+Claude Code skills, present on any install. It calls `smart-commit`, `babysit`,
+and `reflect`, all of which ship inside this plugin. So the bundle is
 self-contained.
 
 ## Install

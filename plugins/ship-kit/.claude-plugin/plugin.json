@@ -1,7 +1,7 @@
 {
   "name": "ship-kit",
   "version": "1.0.0",
-  "description": "/ship takes a working tree to a green, mergeable PR by chaining simplify → verify → code-review → smart-commit → branch hygiene → PR → babysit. /babysit drives a GitHub PR to a fresh APPROVED + CI-green + mergeable state. /smart-commit clusters changes into conventional commits.",
+  "description": "/ship takes a working tree to a green, mergeable PR by chaining simplify → verify → code-review → smart-commit → branch hygiene → PR → babysit → reflect. /babysit drives a GitHub PR to a fresh APPROVED + CI-green + mergeable state. /smart-commit clusters changes into conventional commits. /reflect captures session lessons into the knowledge base.",
   "author": {
     "name": "Nicholas Sollazzo",
     "email": "nick@positronick.com"
