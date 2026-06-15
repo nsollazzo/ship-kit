@@ -20,6 +20,7 @@ Orchestrate the existing skills in order. **Invoke each stage via the Skill tool
 ## Cross-cutting rules
 
 - **Fail loud, never skip silently.** A stage that fails HALTS the pipeline with the evidence. A stage skipped by flag must be named as "skipped (--flag)" in the final summary. Never report "shipped" if anything was silently skipped.
+- **Always simplify + review the full change being shipped.** Stages 1 (simplify) and 3 (code-review) run on *every* `/ship` — regardless of whether the work is already committed or a PR is already open. `--fast` is the **only** way to skip them. "The change being shipped" = uncommitted working-tree edits **plus** any already-committed-but-unmerged work (`git diff <base>...HEAD`), not just what's currently uncommitted — so your code gets simplified and reviewed even after you've committed or opened the PR. Any fixes they produce are committed (Stage 4) and pushed (Stage 7) like any other work.
 - **Project CLAUDE.md overrides this recipe.** Examples: a project that forbids a tracked CHANGELOG.md (skip smart-commit's changelog step there); a project whose tests run in a specific environment (CI, a container, a remote host) rather than locally; a project-specific verify/test recipe always beats the generic one.
 - **State file** `.claude/ship-state.json` (repo-local, like /release's): write `{branch, head_sha, flags, completed_stages: []}` after each stage; on invocation, if it exists and `branch` matches the current branch, offer to resume from the next stage; delete it on success.
 
@@ -28,8 +29,8 @@ Orchestrate the existing skills in order. **Invoke each stage via the Skill tool
 1. Parse flags. Read state file → offer resume if it matches the current branch.
 2. `git status` + `git log @{u}.. 2>/dev/null` + `gh pr view --json url,state 2>/dev/null`. If the tree is clean, nothing is unpushed, AND no open PR exists for this branch → say "nothing to ship" and stop.
 3. **PR already open for this branch:** an open PR does NOT skip the quality stages — "pushed" is not "polished", and a local review pass is cheaper than a remote review round-trip (push + CI + re-review). Adjust as follows:
-   - **Already APPROVED + CI green + mergeable** → don't touch it: pushing cosmetic fixes burns the green (babysit's own guardrail). Skip straight to Stage 9; mark stages 1–8 "N/A (PR already green)".
-   - **Otherwise** → run stages 1–4 against the **PR's full diff vs base** (`git diff origin/<base>...HEAD`), not just the working tree. If they produce fixes, commit (Stage 4) and continue; if they produce nothing, say so and continue.
+   - **Run stages 1–4 against the PR's full diff vs base** (`git diff origin/<base>...HEAD`), not just the working tree — regardless of the PR's current approval state. If they produce fixes, commit (Stage 4) and continue; if they produce nothing, say so and continue.
+   - **Even when the PR is already APPROVED + CI green + mergeable, still run them** (the always-simplify+review policy applies here too). ⚠️ Pushing the resulting fixes re-triggers CI and a fresh review, which can flip the existing approval — that's the accepted trade-off, not a surprise. Make it explicit in the Stage 6 checkpoint summary so the push is a deliberate choice; the Stage 6 gate (unless `--merge`) is the user's last chance to decline burning the green.
    - **Stage 5 is N/A**: never rename a branch with an open PR — deleting/repushing the remote ref closes the PR.
    - **Rebase (Stage 2a) becomes report-only**: report how far behind base the branch is, but don't rebase — once a PR is under review, babysit owns the decision of when an update-with-base is worth a re-review cycle.
    - **Stage 6/7**: the checkpoint gates pushing new fix commits to the existing PR (instead of "open PR?"); `--merge` authorizes it as usual. Stage 7 is just `git push` — no PR creation.
@@ -39,7 +40,7 @@ Orchestrate the existing skills in order. **Invoke each stage via the Skill tool
 
 ## Stage 1 — Simplify (skip if --fast)
 
-Invoke the `simplify` skill. It applies quality cleanups to the working tree.
+Invoke the `simplify` skill on the **full change being shipped** (see *Always simplify + review* in Cross-cutting rules — working-tree edits plus already-committed-but-unmerged work, `git diff <base>...HEAD`, not just uncommitted). It applies quality cleanups to those files; if the change was already fully committed, its edits land in the working tree and are picked up by Stage 4.
 
 ## Stage 2 — Verify (skip if --no-verify)
 
@@ -61,7 +62,7 @@ git diff --name-only HEAD...origin/<base>           # files base changed since w
 
 ## Stage 3 — Code review (skip if --fast)
 
-Invoke the `code-review` skill with `--fix` at the requested effort (default medium).
+Invoke the `code-review` skill with `--fix` at the requested effort (default medium), reviewing the **full change being shipped** (the diff vs base, per *Always simplify + review* in Cross-cutting rules) — so already-committed code is reviewed too, not just uncommitted edits.
 If it applied fixes AND Stage 2 ran: re-run the cheap verification (tests, not the full app walk) so review fixes are never committed unverified. Same gate as Stage 2.
 
 ## Stage 4 — Commit
