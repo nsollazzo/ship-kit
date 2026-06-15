@@ -19,7 +19,7 @@ self-contained.
 ## Install
 
 ```
-/plugin marketplace add positronick/ship-kit      # or your fork's owner/repo
+/plugin marketplace add nsollazzo/ship-kit      # or your fork's owner/repo
 /plugin install ship-kit
 ```
 
