@@ -1,14 +1,23 @@
 ---
 name: smart-commit
 description: |
-  Automatically cluster and commit git changes into logical groups with conventional commit messages.
-  Use when: committing multiple unrelated changes, cleaning up work before PR, organizing messy commits,
-  or when asked to "commit my changes", "smart commit", "organize commits", or "cluster commits".
+  Automatically cluster and commit git changes into logical groups with conventional commit
+  messages. Use when: committing multiple unrelated changes, cleaning up work before PR,
+  organizing messy commits, or when asked to "commit my changes", "smart commit", "organize
+  commits", or "cluster commits".
+license: MIT
+metadata:
+  version: "2.1.0"
 ---
 
 # Smart Commit
 
 Cluster uncommitted changes into logical groups and commit each with a clear conventional commit message.
+
+> **Sub-agents.** Committing is **sequential by design** — every commit shares one git index,
+> so parallel sub-agents staging into it would corrupt each other. Do the clustering and
+> commits in one agent. (For a very large diff you may use a sub-agent to *propose* the
+> clustering, but the `git add` / `git commit` steps stay in the main agent.)
 
 ## Workflow
 
@@ -72,7 +81,8 @@ If `CHANGELOG.md` doesn't exist or has no `## [Unreleased]` section, skip this s
 
 ## After Committing
 
-If this session involved tricky bugs, new integrations, or non-obvious patterns, suggest running `/reflect` to capture lessons learned.
+If this session involved tricky bugs, new integrations, or non-obvious patterns, suggest
+running the `reflect` skill to capture lessons learned.
 
 ## Rules
 

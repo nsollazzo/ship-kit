@@ -6,14 +6,14 @@
     "email": "nick@positronick.com"
   },
   "metadata": {
-    "description": "The ship → babysit PR pipeline: clean, verify, review, commit, open a PR, and drive it to a green review approval.",
-    "version": "1.0.0"
+    "description": "The portable ship → babysit PR pipeline: clean, verify, review, commit, open a PR, and drive it to a green review approval. Self-contained and installable on any SKILL.md-compatible agent.",
+    "version": "2.1.0"
   },
   "plugins": [
     {
       "name": "ship-kit",
-      "description": "/ship orchestrates simplify → verify → code-review → smart-commit → branch hygiene → PR → babysit → reflect; /babysit drives a GitHub PR to a fresh APPROVED + CI-green + mergeable state.",
-      "source": "./plugins/ship-kit"
+      "description": "/ship orchestrates simplify → verify → code-review → smart-commit → branch hygiene → PR → babysit → reflect; /babysit drives a GitHub PR to a fresh APPROVED + CI-green + mergeable state. Bundles simplify/verify/code-review so it runs without relying on pre-installed skills.",
+      "source": "./.agents"
     }
   ]
 }
