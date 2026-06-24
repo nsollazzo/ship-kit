@@ -1,0 +1,11 @@
+{
+  "name": "ship-kit",
+  "version": "2.1.0",
+  "description": "Portable ship → babysit PR pipeline. /ship chains simplify → verify → code-review → smart-commit → branch hygiene → PR → babysit → reflect. Bundles its own simplify/verify/code-review skills so it is self-contained on any harness (Claude Code, Codex, Grok, Hermes, OpenClaw). /babysit drives a PR to APPROVED + CI-green + mergeable; /smart-commit clusters conventional commits; /reflect captures session lessons.",
+  "author": {
+    "name": "Nicholas Sollazzo",
+    "email": "nick@positronick.com"
+  },
+  "homepage": "https://github.com/nsollazzo/ship-kit",
+  "license": "MIT"
+}
