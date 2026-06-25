@@ -1,7 +1,8 @@
 # ship-kit
 
-A portable agent-skills bundle that takes a finished change from working tree to a green,
-mergeable pull request — and keeps the PR honest until a reviewer approves it.
+A portable agent-skills bundle for the whole dev loop: turn a **reported bug** into a fix, or
+a **finished change** into a green, mergeable pull request — and keep the PR honest until a
+reviewer approves it.
 
 ship-kit's skills follow the open [Agent Skills](https://agentskills.io) standard
 (`SKILL.md`), so the **same kit installs on any compatible agent** — Claude Code, OpenAI
@@ -12,13 +13,16 @@ it needs, so it does **not** rely on skills being pre-installed by the host.
 
 | Skill | What it does |
 |-------|--------------|
-| `ship` | Orchestrates the full pipeline: **simplify → verify → code-review → smart-commit → branch hygiene → PR → babysit → reflect.** Stops at *approved + CI green + mergeable*; only merges with `--merge`. |
+| `fix` | The inbound headliner: **triage → branch → implement → ship.** Diagnoses a reported bug, cuts a `fix/…` branch, implements the fix at the root cause, then hands off to `ship` for the whole way to a green PR. Pass `--yolo` to run hands-off. |
+| `ship` | The outbound headliner: **simplify → verify → code-review → smart-commit → branch hygiene → PR → babysit → reflect.** Stops at *approved + CI green + mergeable*; only merges with `--merge`. |
+| `triage` | Diagnoses a bug with **parallel sub-agents** across different angles (reproduce, recent changes, backward root-cause trace, blast-radius), adversarially verifies the leading cause, and proposes the fix — **read-only**, never edits code. `fix` is the applier. |
 | `babysit` | Drives one GitHub PR to a **fresh APPROVED + all CI green + `mergeable`** state. Each pass verifies every review finding against the code, fixes the valid ones, pushes back with evidence on the invalid, and replies on every thread. Never merges — a human does that. |
 | `smart-commit` | Clusters uncommitted changes into logical groups and commits each with a conventional-commit message. |
 | `reflect` | Captures session lessons (gotchas, patterns, integration quirks) into the knowledge base. Self-gating, never writes without your approval. Runs as `ship`'s final step. |
 | `simplify` | Quality-only cleanup pass (reuse / simplification / efficiency) over a change. **Bundled** so `ship` works without a pre-installed simplifier. |
 | `verify` | Runs the project's tests / app and observes the change actually working. **Bundled.** |
 | `code-review` | Reviews a diff for correctness bugs **and** cleanups, then applies fixes (`--fix`) or posts inline PR comments (`--comment`). **Bundled.** |
+| `yolo` | Autonomous, hands-off mode: never asks, resolves ambiguity by evidence + research, fans out sub-agents. Also the `--yolo` flag on `ship` / `fix`. **Bundled.** |
 
 ### Self-contained by design
 
@@ -81,11 +85,14 @@ for you. Paste one of these:
 Once installed, just say what you want — the skills auto-trigger by description on every
 agent:
 
-> *"ship it"* · *"babysit PR 412"* · *"smart commit my changes"* · *"reflect on this session"*
+> *"fix this bug: …"* · *"triage this failure"* · *"ship it"* · *"babysit PR 412"* ·
+> *"smart commit my changes"* · *"reflect on this session"*
 
 They're also slash commands where the host exposes them: `/ship-kit:ship` on Claude Code,
 `$ship` on Codex, `/ship` on Grok / Hermes / OpenClaw. `ship` takes flags — `--fast`,
-`--merge`, `--no-verify`.
+`--merge`, `--no-verify`, `--yolo`; `fix` takes `--yolo` (plus the ship flags it passes
+through). `--yolo` runs hands-off (no questions); it stops at green unless you also pass
+`--merge`.
 
 **Full usage guide** — the pipeline stage by stage, every flag, `babysit`, and worked
 examples: **[docs/USAGE.md](docs/USAGE.md)**.
