@@ -17,7 +17,7 @@ whatever directory your agent scans.
 |-------|--------------------|-----------------|------------|
 | **Claude Code** | plugin `skills/`, `~/.claude/skills`, `.claude/skills` | `/plugin marketplace add nsollazzo/ship-kit` → `/plugin install ship-kit` (or `bin/install.sh claude`) | auto by description + `/ship` etc. |
 | **OpenAI Codex** | `.agents/skills` (repo), `~/.agents/skills` (user) | `bin/install.sh agents` | implicit (description) + `$ship` |
-| **xAI Grok Build** (official) | `.grok/skills`, `~/.grok/skills`, **and reads Claude plugins/`.claude/skills` with zero config** | `bin/install.sh grok` (or just use the Claude plugin) | auto + `/ship` |
+| **xAI Grok Build** (official) | `~/.grok/plugins/` (plugin `skills/`), `~/.grok/skills/`, repo `.agents/skills/` | `grok plugin install nsollazzo/ship-kit#.agents --trust` (recommended) | auto + `/ship` |
 | **Grok CLI** (community) | `.agents/skills`, `~/.agents/skills` | `bin/install.sh agents` | auto (reads skill on demand) |
 | **Nous Hermes** | `~/.hermes/skills/<category>/<name>` | `hermes skills tap add nsollazzo/ship-kit` (native), or `bin/install.sh hermes` (local) | auto + `/ship` slash commands |
 | **OpenClaw** | `<workspace>/skills`, `~/.agents/skills`, `~/.openclaw/skills` | `bin/install.sh openclaw` (or `agents`) | auto + slash command |
@@ -30,7 +30,7 @@ under `$HOME`. `bin/install.sh --project` drops the skills into the current repo
 ## Per-agent notes
 
 ### Claude Code
-The repo is a plugin marketplace. `marketplace.json` (at the repo root) points its one
+The repo is a plugin marketplace. `.claude-plugin/marketplace.json` points its one
 plugin's `source` at `./.agents`, so Claude reads the canonical `.agents/skills/` tree
 directly — no separate copy. After `/plugin install ship-kit` the skills auto-trigger by
 description, and are available as **plugin-namespaced** slash commands: `/ship-kit:ship`,
@@ -54,11 +54,76 @@ ship's one checkpoint degrades to a plain-text "proceed? (yes/no)" which Codex h
 interactive mode (in `codex exec` non-interactive mode it stops and reports "staged and
 waiting", as designed).
 
-### xAI Grok
-- **Grok Build (official)** is "compatible with Claude Code with zero configuration" — it
-  reads Claude plugins, `.claude/skills`, and `CLAUDE.md` directly. You can install via the
-  Claude plugin path *or* `bin/install.sh grok` (→ `~/.grok/skills`).
-- **Grok CLI (community, superagent-ai)** scans `.agents/skills` — use `bin/install.sh agents`.
+### Grok Build
+
+ship-kit's plugin root is **`.agents/`** (manifest at `.agents/.claude-plugin/plugin.json`).
+The repo root is not a Grok plugin on its own.
+
+#### Recommended: plugin install (global, every project)
+
+```bash
+grok plugin install nsollazzo/ship-kit#.agents --trust
+grok inspect   # skills should show source: plugin: ship-kit
+```
+
+The `#.agents` suffix matters: it installs the real plugin tree (versioned manifest, name
+`ship-kit`). Installing the whole repo (`grok plugin install nsollazzo/ship-kit`) still
+works, but Grok falls back to the root `skills/` mirror (the Hermes adapter) and names the
+plugin `ship-kit-<hash>`.
+
+From a local clone:
+
+```bash
+grok plugin install ./.agents --trust
+```
+
+#### Alternative: skills-only copy
+
+```bash
+git clone https://github.com/nsollazzo/ship-kit && cd ship-kit
+bin/install.sh grok          # copies → ~/.grok/skills/
+bin/install.sh grok --link   # symlinks (handy while developing ship-kit itself)
+```
+
+This works, but it is not a plugin install — no plugin metadata or `grok plugin update`.
+**Pick one method.** Installing both the plugin and `bin/install.sh grok` loads every skill
+twice (`user` + `plugin: ship-kit` in `grok inspect`).
+
+#### Project-scoped (one repo / team)
+
+```bash
+bin/install.sh --project     # drops skills into ./.agents/skills/
+```
+
+Grok scans `.agents/skills/` at each tier (alongside `.grok/skills/`), walked from cwd to
+the repo root. Commit `.agents/skills/` so teammates get the kit in-tree.
+
+#### Already inside this repo?
+
+If your cwd is inside a ship-kit checkout, Grok discovers the skills from `.agents/skills/`
+as project-scoped skills with no install step. That does **not** carry over to other
+projects — install globally with `grok plugin install` for that. (`bin/install.sh --project`
+refuses to write into this repo's canonical `.agents/skills/` tree — use the plugin or
+skills paths above instead.)
+
+#### Marketplace browse (TUI)
+
+```bash
+grok plugin marketplace add nsollazzo/ship-kit
+```
+
+Then in Grok: `/marketplace` → select ship-kit → `i` to install. There is no separate
+`grok plugin install <marketplace>/<plugin>` CLI; direct install is still
+`grok plugin install nsollazzo/ship-kit#.agents --trust`.
+
+Grok is Claude Code–compatible for *discovery* (it reads `.claude/` paths and Claude
+marketplace sources), but it does **not** use Claude's `/plugin marketplace add` or
+`/plugin install` slash commands. Use `grok plugin` or the TUI.
+
+#### Grok CLI (community, superagent-ai)
+
+The community CLI scans `.agents/skills` — use `bin/install.sh agents`, not the Grok Build
+plugin path above.
 
 ### Nous Hermes
 Two ways in:
@@ -119,3 +184,11 @@ all of them:
 - **Two of the same skill on Claude Code.** Bundled skills are plugin-namespaced
   (`ship-kit:code-review`) and do not override Claude's built-in `/code-review`; `ship`
   deliberately prefers the built-in there.
+- **Duplicate ship-kit skills on Grok Build.** If you ran both `grok plugin install` and
+  `bin/install.sh grok`, `grok inspect` lists each skill twice (`user` and
+  `plugin: ship-kit`). Keep one install path; uninstall the other with
+  `grok plugin uninstall ship-kit --confirm` or by removing the copies under
+  `~/.grok/skills/`.
+- **`code-review` name collision on Grok Build.** Grok ships a bundled `code-review` skill
+  at `~/.grok/skills/`. ship-kit's copy coexists under `plugin: ship-kit:code-review`; use
+  the qualified name if Grok picks the wrong one.
