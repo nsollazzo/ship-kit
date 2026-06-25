@@ -1,5 +1,5 @@
 {
   "groupings": [
-    { "title": "ship-kit", "skills": ["babysit","code-review","reflect","ship","simplify","smart-commit","verify"] }
+    { "title": "ship-kit", "skills": ["babysit","code-review","fix","reflect","ship","simplify","smart-commit","triage","verify","yolo"] }
   ]
 }
