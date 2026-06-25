@@ -45,7 +45,19 @@ project-scoped installs, and troubleshooting.
 /plugin install ship-kit
 ```
 
-**Codex, Grok, OpenClaw, VS Code, or any Agent-Skills agent** — clone and run the installer:
+**xAI Grok Build** (official CLI) — install the plugin (recommended; works in every project):
+
+```bash
+grok plugin install nsollazzo/ship-kit#.agents --trust
+grok inspect   # confirm ship, fix, babysit show source: plugin: ship-kit
+```
+
+From a local clone: `grok plugin install ./.agents --trust`. Skills-only alternative:
+`bin/install.sh grok` (→ `~/.grok/skills/`). See [docs/INSTALL.md](docs/INSTALL.md#grok-build)
+for project-scoped installs, marketplace browse, and dev symlinks. Grok does **not** use
+Claude's `/plugin` commands — use the `grok plugin` CLI or `/marketplace` in the TUI.
+
+**Codex, OpenClaw, VS Code, or any other Agent-Skills agent** — clone and run the installer:
 
 ```bash
 git clone https://github.com/nsollazzo/ship-kit && cd ship-kit
@@ -54,8 +66,9 @@ bin/install.sh agents      # → ~/.agents/skills  (the widest-reach open-standa
 ```
 
 Per-harness targets: `agents` (Codex / Grok community / OpenClaw / VS Code), `claude`,
-`grok` (xAI Grok Build), `hermes`, `openclaw`, `copilot`. Use `--project` to drop the skills
-into the current repo's `.agents/skills/`, or `--dest <dir>` for an arbitrary location.
+`grok` (Grok Build skills copy), `hermes`, `openclaw`, `copilot`. Use `--project` to drop
+the skills into the current repo's `.agents/skills/`, or `--dest <dir>` for an arbitrary
+location.
 
 **Nous Hermes** — install natively as a Tap (no clone needed):
 
@@ -63,19 +76,18 @@ into the current repo's `.agents/skills/`, or `--dest <dir>` for an arbitrary lo
 hermes skills tap add nsollazzo/ship-kit
 ```
 
-**xAI Grok** needs nothing extra: official **Grok Build** reads this repo's Claude plugin
-(`marketplace.json` → `.agents`) with zero config, and the **community grok-cli** scans
-`.agents/skills/` — so `bin/install.sh grok` or the Claude plugin path both work.
-
 ### Ask your agent to install it
 
 Most of these agents have shell access, so you can just ask the agent to install ship-kit
 for you. Paste one of these:
 
-- **Any shell-capable agent (Codex, Grok, OpenClaw, …):**
+- **Grok Build:**
+  > Run `grok plugin install nsollazzo/ship-kit#.agents --trust`, then `grok inspect` and
+  > confirm `ship`, `fix`, and `babysit` are listed with source `plugin: ship-kit`.
+- **Any other shell-capable agent (Codex, OpenClaw, …):**
   > Install the ship-kit skills for me: clone `https://github.com/nsollazzo/ship-kit` and run
-  > `bin/install.sh` with the target that matches this agent (one of: agents, claude, grok,
-  > hermes, openclaw, copilot). Then reload skills and confirm `ship` and `babysit` are listed.
+  > `bin/install.sh` with the target that matches this agent (one of: agents, claude, hermes,
+  > openclaw, copilot). Then reload skills and confirm `ship` and `babysit` are listed.
 - **Nous Hermes:**
   > Run `hermes skills tap add nsollazzo/ship-kit`, then list skills and confirm `ship` and `babysit` loaded.
 - **Claude Code:** type `/plugin marketplace add nsollazzo/ship-kit`, then `/plugin install ship-kit`.
