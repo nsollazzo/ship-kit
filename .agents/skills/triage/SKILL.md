@@ -10,7 +10,7 @@ description: |
   fix, hand off to the `fix` skill (branch + implement + ship).
 license: MIT
 metadata:
-  version: "2.2.0"
+  version: "2.3.0"
 argument-hint: "<issue description or reference>"
 ---
 

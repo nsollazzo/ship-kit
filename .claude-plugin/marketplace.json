@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "The portable dev-loop kit: fix (triage → branch → implement) and ship (clean → verify → review → commit → PR → babysit → reflect) — from a reported bug or a finished change to a green, mergeable PR. Self-contained and installable on any SKILL.md-compatible agent.",
-    "version": "2.2.0"
+    "version": "2.3.0"
   },
   "plugins": [
     {
