@@ -163,9 +163,10 @@ all of them:
 2. **No `AskUserQuestion`.** ship's single checkpoint and reflect's approval step are plain
    "ask in chat and wait" — degrading to text on agents without a structured prompt
    (Hermes `clarify`, Codex approval overlay, OpenClaw channel message all satisfy it).
-3. **No assumed loop runtime.** `babysit`'s "loop until green" uses your harness's recurring
-   primitive if it has one (Claude `loop`, Hermes cron/blueprint) and otherwise iterates
-   in-session.
+3. **No assumed loop runtime.** `babysit` owns its own loop and runs it in-session on any
+   harness; a harness's recurring primitive (Claude `loop`/`schedule`, Hermes
+   cron/blueprint) is used only to *wait* between passes. babysit's "Waiting between passes"
+   table is the per-harness source of truth.
 4. **No Claude-only packaging requirement.** Distribution is "drop the skill directory into
    a scanned skills dir." The Claude marketplace is one adapter, not the only path.
 5. **Frontmatter hygiene.** Only `name` + `description` are load-bearing; `license: MIT` is

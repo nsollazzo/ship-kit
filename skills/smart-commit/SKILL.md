@@ -7,7 +7,7 @@ description: |
   commits", or "cluster commits".
 license: MIT
 metadata:
-  version: "2.2.0"
+  version: "2.3.0"
 ---
 
 # Smart Commit

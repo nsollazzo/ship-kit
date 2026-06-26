@@ -1,6 +1,6 @@
 {
   "name": "ship-kit",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Portable dev-loop kit. /fix triages a bug with parallel sub-agents then branches, implements, and ships it; /ship chains simplify → verify → code-review → smart-commit → branch hygiene → PR → babysit → reflect; /triage diagnoses a bug read-only; /babysit drives a PR to APPROVED + CI-green + mergeable. Bundles its own triage/simplify/verify/code-review/yolo skills so it is self-contained on any harness (Claude Code, Codex, Grok, Hermes, OpenClaw). Pass --yolo to run fix/ship hands-off. /smart-commit clusters conventional commits; /reflect captures session lessons.",
   "author": {
     "name": "Nicholas Sollazzo",

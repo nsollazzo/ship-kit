@@ -121,9 +121,10 @@ PR is **freshly APPROVED + all CI green + mergeable**. It never merges; a human 
 **Just say:** *"babysit PR 412"* (or `/ship-kit:babysit 412`, `$babysit 412`, `/babysit 412`).
 Add the repo if it's not the current one: *"babysit PR 412 in nsollazzo/ship-kit"*.
 
-**Looping until green:** one run = one check-react pass. To keep going automatically, use
-your harness's recurring mechanism (Claude Code's `loop` skill, a Hermes cron/blueprint, or
-just ask the agent to keep checking). With no loop primitive it iterates in-session.
+**Looping until green:** babysit owns its loop and runs it itself, pass after pass, until
+the PR is green — you don't re-run it each cycle. Your harness's recurring primitive (Claude
+Code's `loop`/`schedule`, a Hermes cron/blueprint) only controls *how it waits* between
+passes; with none, it waits in-session.
 
 Needs the [`gh`](https://cli.github.com/) CLI authenticated (`gh auth status`).
 

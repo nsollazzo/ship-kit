@@ -9,7 +9,7 @@ description: |
   run hands-off (no questions) to a green PR; merge still needs `--merge`.
 license: MIT
 metadata:
-  version: "2.2.0"
+  version: "2.3.0"
 argument-hint: "[--yolo] [--fast] [--merge] [--no-verify] <issue description or reference>"
 ---
 

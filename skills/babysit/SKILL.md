@@ -8,7 +8,7 @@ description: |
   green". Never merges — a human does that.
 license: MIT
 metadata:
-  version: "2.2.0"
+  version: "2.3.0"
 argument-hint: "<PR number> [owner/repo]"
 ---
 
@@ -22,15 +22,33 @@ the repo is omitted, default to the current repo
 head commit — with **all CI checks green** and `mergeable == MERGEABLE`. Loop until then.
 **A human still does the merge; you never merge.**
 
-**Looping until the goal:** each run does one check-react cycle, then either declares the
-goal met and ENDS, or continues. To loop automatically, use whatever recurring mechanism
-your harness offers — a `loop`/`watch` skill, a cron/scheduled-automation primitive, or
-simply re-running this skill each cycle. With no loop primitive, iterate in-session: do a
-pass, wait for CI/review to land, do the next. You can also run a single pass for a
-one-shot status check.
+**You are the loop — do not delegate it away.** Run pass after pass *yourself* until the
+GOAL is met. One pass = the full procedure below (observe → React protocol on any new
+finding → evaluate the GOAL), **not** a bare status check. Between passes you only need to *wait* for
+CI/review to land; use your harness's wait/recurring primitive for that (see the table
+below), then run the next pass. The primitive controls **how you wait**, never **whether
+you loop**. For a one-shot status check, run a single pass.
+
+### Waiting between passes (per harness)
+
+The loop is always yours; this is only how to *wait* between passes (and re-enter for the
+long, blocked-on-a-human waits without holding a session open):
+
+| Harness | Wait / re-enter primitive |
+|---------|---------------------------|
+| Claude Code | the `loop` skill (recurring; self-paces between passes), `schedule` (cron, for long/over-session waits), or a background `gh` poll that wakes you to run the next full pass |
+| Nous Hermes | `cronjob` / `blueprint` |
+| Grok Build | wait in-session — no interval scheduler; `/goal` mode natively iterates until verified (fits babysit's GOAL) |
+| OpenAI Codex | wait in-session — no native scheduler; use `codex exec` under external cron for unattended recurrence |
+| Any other / none | wait in-session (short sleep while CI/review run), then run the next pass |
 
 ## Operating principles (non-negotiable)
 
+- **Never substitute a hand-rolled CI poll for this skill.** Watching `gh pr checks` /
+  `gh pr view` in a background loop is **not** babysitting — it skips the React protocol
+  (verify every finding, reply on every thread, resolve), which is the whole point. The
+  `gh` snippet below is the *observe* step of a pass, not a standalone watcher to lift out.
+  Each cycle is a full pass of *this* procedure.
 - **Verify every finding against the code — do not capitulate.** Open the file, run the
   check, read the diff. A reviewer (review bot or human) can be wrong. Fix what's real;
   push back with evidence on what isn't. The code, the tests, and the runtime behavior are
@@ -48,6 +66,9 @@ one-shot status check.
   a `Co-Authored-By` trailer.
 
 ## Each pass (one iteration of the loop)
+
+These commands are only the pass's **observe** step; work through the steps below to finish
+the pass.
 
 > In the snippets below, substitute the PR number and repo you were invoked with
 > **literally**.
@@ -70,7 +91,7 @@ gh api "repos/$REPO/pulls/$PR/reviews" --jq "[.[]|select(.user.login!=\"$ME\")]|
    - **Met** — `reviewDecision == APPROVED` (fresh, i.e. a non-self APPROVED review id newer
      than your last push) **and** every CI check passes **and** `mergeable == MERGEABLE`:
      report the green light, notify the user, remind them a human still merges, and **END
-     the loop** (do not schedule another iteration).
+     the loop** (don't run another pass).
    - **Not met** — state what's outstanding and **continue the loop**. Pace the next check
      to when progress is expected: a re-review lands shortly after a push, so a short wait
      is right while CI/review run; use a longer wait if you're blocked on a *human* reviewer.
@@ -130,4 +151,4 @@ gh api graphql -f query='mutation($id:ID!){resolveReviewThread(input:{threadId:$
 ## Done
 
 Goal met → report it, notify the user, remind them a human still merges, and stop looping
-(omit the next iteration).
+(don't run another pass).

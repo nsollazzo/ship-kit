@@ -10,7 +10,7 @@ description: |
   as the `--yolo` flag on the `ship` and `fix` meta-skills.
 license: MIT
 metadata:
-  version: "2.2.0"
+  version: "2.3.0"
 ---
 
 # YOLO — decide, don't ask; parallelize, don't plod

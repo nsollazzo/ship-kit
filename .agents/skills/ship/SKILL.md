@@ -8,7 +8,7 @@ description: |
   + CI green + mergeable; does NOT merge unless --merge.
 license: MIT
 metadata:
-  version: "2.2.0"
+  version: "2.3.0"
 argument-hint: "[--fast] [--merge] [--no-verify] [--yolo]"
 ---
 
@@ -219,18 +219,18 @@ answer; don't assume one.) This is the only outward-facing gate. Authorization r
 
 ## Stage 8 — Babysit to green
 
-Run the `babysit` skill to drive the PR to the goal (fresh APPROVED + all CI green +
-mergeable). The Stage 6 checkpoint already authorized hands-off continuation — don't ask
+**Invoke the `babysit` skill** (via your harness's skill tool if it has one; otherwise load
+`babysit/SKILL.md` and follow it) to drive the PR to the goal (fresh APPROVED + all CI green
++ mergeable). The Stage 6 checkpoint already authorized hands-off continuation — don't ask
 again.
 
-**Looping until the goal:** babysit does one check-react pass per run and defines the goal
-itself. To loop it until green, use whatever recurring mechanism your harness offers (e.g.
-Claude Code's `loop` skill; a cron/scheduled-automation primitive; or simply re-running
-babysit yourself each cycle). If your harness has no loop primitive, iterate in-session:
-run a pass, wait for CI/review to land, run the next — until babysit reports the goal met
-or you're genuinely blocked on a human reviewer.
+babysit **owns its own loop** — it runs pass after pass until the goal. **Do not reimplement
+it here, and do not substitute a hand-rolled `gh pr checks` poll** — that skips babysit's
+React protocol (verify findings, reply on threads, resolve). Your only job this stage is to
+invoke babysit and let it run to the goal, or report when it's genuinely blocked on a human
+reviewer.
 
-If the user wants a single status pass instead of the full loop, run `babysit` once.
+For a single status pass instead of the full loop, invoke `babysit` for one pass.
 
 ## Stage 9 — End state
 
